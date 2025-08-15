@@ -111,8 +111,8 @@ int main()
     };
 
     unsigned int VBOs[2], VAOs[2];
-    glGenVertexArrays(2, &VAOs[2]);
-    glGenBuffers(2, &VBOs[2]);
+    glGenVertexArrays(2, VAOs);
+    glGenBuffers(2, VBOs);
     // bind the Vertex Array Object first, then bind and set vertex buffer(s), 
     // and then configure vertex attributes(s).
     glBindVertexArray(VAOs[0]);
@@ -123,10 +123,6 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    // unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
     // bind the Vertex Array Object first, then bind and set vertex buffer(s), 
     // and then configure vertex attributes(s).
     glBindVertexArray(VAOs[1]);
@@ -134,17 +130,17 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(triangleB), triangleB, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
 
     // note that this is allowed, the call to glVertexAttribPointer registered 
     // VBO as the vertex attribute's bound vertex buffer object so afterwards 
     // we can safely unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0); 
+    // glBindBuffer(GL_ARRAY_BUFFER, 0); 
 
     // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    glBindVertexArray(0); 
+    // glBindVertexArray(0); 
 
 
     // uncomment this call to draw in wireframe polygons.
@@ -163,18 +159,17 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // draw our first triangle
         glUseProgram(shaderProgram);
+
+        // triangleA
         glBindVertexArray(VAOs[0]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
-        glBindVertexArray(0); // no need to unbind it every time 
 
+        // triangleB
         glBindVertexArray(VAOs[1]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
-        glBindVertexArray(0);
-
-
  
+
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
