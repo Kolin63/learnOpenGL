@@ -24,6 +24,14 @@ const char *orangeFragmentShaderSource = "#version 330 core\n"
 "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
 "}\n\0";
 
+const char *yellowFragmentShaderSource = "#version 330 core\n"
+"out vec4 FragColor;\n"
+"void main()\n"
+"{\n"
+"   FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
+"}\n\0";
+
+int main()
 {
   // glfw: initialize and configure
   // ------------------------------
@@ -72,30 +80,58 @@ const char *orangeFragmentShaderSource = "#version 330 core\n"
     glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
     std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
   }
-  // fragment shader
-  unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-  glCompileShader(fragmentShader);
+
+  // orange fragment shader
+  unsigned int orangeFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(orangeFragmentShader, 1, &orangeFragmentShaderSource, NULL);
+  glCompileShader(orangeFragmentShader);
   // check for shader compile errors
-  glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+  glGetShaderiv(orangeFragmentShader, GL_COMPILE_STATUS, &success);
   if (!success)
   {
-    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+    glGetShaderInfoLog(orangeFragmentShader, 512, NULL, infoLog);
     std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
   }
-  // link shaders
-  unsigned int shaderProgram = glCreateProgram();
-  glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragmentShader);
-  glLinkProgram(shaderProgram);
+
+  // yellow fragment shader
+  unsigned int yellowFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(yellowFragmentShader, 1, &yellowFragmentShaderSource, NULL);
+  glCompileShader(yellowFragmentShader);
+  // check for shader compile errors
+  glGetShaderiv(yellowFragmentShader, GL_COMPILE_STATUS, &success);
+  if (!success)
+  {
+    glGetShaderInfoLog(yellowFragmentShader, 512, NULL, infoLog);
+    std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+  }
+
+  // link orange shaders
+  unsigned int orangeShaderProgam = glCreateProgram();
+  glAttachShader(orangeShaderProgam, vertexShader);
+  glAttachShader(orangeShaderProgam, orangeFragmentShader);
+  glLinkProgram(orangeShaderProgam);
   // check for linking errors
-  glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+  glGetProgramiv(orangeShaderProgam, GL_LINK_STATUS, &success);
   if (!success) {
-    glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+    glGetProgramInfoLog(orangeShaderProgam, 512, NULL, infoLog);
     std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
   }
   glDeleteShader(vertexShader);
-  glDeleteShader(fragmentShader);
+  glDeleteShader(orangeFragmentShader);
+
+  // link yellow shaders
+  unsigned int yellowShaderProgam = glCreateProgram();
+  glAttachShader(yellowShaderProgam, vertexShader);
+  glAttachShader(yellowShaderProgam, yellowFragmentShader);
+  glLinkProgram(yellowShaderProgam);
+  // check for linking errors
+  glGetProgramiv(yellowShaderProgam, GL_LINK_STATUS, &success);
+  if (!success) {
+    glGetProgramInfoLog(yellowShaderProgam, 512, NULL, infoLog);
+    std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+  }
+  glDeleteShader(vertexShader);
+  glDeleteShader(yellowFragmentShader);
 
   // set up vertex data (and buffer(s)) and configure vertex attributes
   // ------------------------------------------------------------------
@@ -159,13 +195,14 @@ const char *orangeFragmentShaderSource = "#version 330 core\n"
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(shaderProgram);
 
     // triangleA
+    glUseProgram(orangeShaderProgam);
     glBindVertexArray(VAOs[0]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
     // triangleB
+    glUseProgram(yellowShaderProgam);
     glBindVertexArray(VAOs[1]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -182,7 +219,8 @@ const char *orangeFragmentShaderSource = "#version 330 core\n"
   glDeleteVertexArrays(1, &VAOs[1]);
   glDeleteBuffers(1, &VBOs[0]);
   glDeleteBuffers(1, &VBOs[1]);
-  glDeleteProgram(shaderProgram);
+  glDeleteProgram(orangeShaderProgam);
+  glDeleteProgram(yellowShaderProgam);
 
   // glfw: terminate, clearing all previously allocated GLFW resources.
   // ------------------------------------------------------------------
