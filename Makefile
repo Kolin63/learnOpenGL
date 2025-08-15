@@ -2,16 +2,16 @@ CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Iinclude
 LDFLAGS = -lglfw -ldl
 
-SRC = src/main.cpp src/glad.c
+all: main
 
-OBJ = $(SRC:.cpp=.o)
+main: build/main.o build/glad.o
+	$(CXX) $(CXXFLAGS) -o main build/main.o build/glad.o $(LDFLAGS)
 
-TARGET = main
+build/main.o: src/main.cpp
+	$(CXX) $(CXXFLAGS) -c src/main.cpp -o build/main.o $(LDFLAGS)
 
-all: $(TARGET)
-
-$(TARGET): $(SRC)
-	$(CXX) $(CXXFLAGS) $(SRC) -o $(TARGET) $(LDFLAGS)
+build/glad.o: src/glad.c
+	$(CXX) $(CXXFLAGS) -c src/glad.c -o build/glad.o $(LDFLAGS)
 
 clean:
-	rm -f $(TARGET) *.o
+	rm -f main *.o
